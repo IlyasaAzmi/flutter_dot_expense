@@ -17,6 +17,8 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
   List<Expense> _allExpenses;
   int _total;
 
+  List<int> _totalCategory = List<int>();
+
   List<Category> _availableCategory = [
     Category('Makanan', 'assets/images/makanan.png'),
     Category('Internet', 'assets/images/internet.png'),
@@ -72,10 +74,25 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
     });
   }
 
+  Future<int> calculatePerCategory(String category) async {
+    var total = (await dbHelper.getTotalCategory('$category'))[0]['Total'];
+    return total;
+  }
+
+  void _getTotalPerCategory(){
+    for (var cat in _availableCategory) {
+      calculatePerCategory(cat.name).then((value) {
+        setState(() {
+          _totalCategory.add(value);
+        });
+      });
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
-
+    _getTotalPerCategory();
     _calculateTotalExpenses();
     super.initState();
   }
@@ -159,7 +176,11 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                               image:
                                   AssetImage(_availableCategory[index].image)),
                           Text(_availableCategory[index].name),
-                          Text('nominal')
+                          _totalCategory.isNotEmpty ?
+                              _totalCategory[index] != null ?
+                          Text(formatCurrency.format(_totalCategory[index]), style: TextStyle(
+                            fontWeight: FontWeight.bold
+                          ),) : Text('Rp 0') : SizedBox()
                         ],
                       ),
                     ),
@@ -189,7 +210,9 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
                         Container(
                           padding: EdgeInsets.fromLTRB(30, 30, 30, 0),
                           child: Text(
-                            'Hari Ini',
+                            _allExpenses.isNotEmpty
+                                ? 'Hari Ini'
+                                : 'Tidak ada pengeluaran',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -240,6 +263,7 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
               .then((value) {
             _getAllExpenses();
             _calculateTotalExpenses();
+            _getTotalPerCategory();
           });
         },
         tooltip: 'Increment',

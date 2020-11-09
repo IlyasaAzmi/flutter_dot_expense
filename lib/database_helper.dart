@@ -105,4 +105,12 @@ class DatabaseHelper {
     var result = await db.rawQuery("SELECT SUM($columnNominal) as Total FROM $table");
     return result.toList();
   }
+
+  Future<List> getTotalCategory(String category) async {
+    Database db = await instance.database;
+    var result = await db.rawQuery('''
+    SELECT SUM($columnNominal) as Total FROM $table WHERE $columnCategory = '$category' 
+    ''');
+    return result;
+  }
 }

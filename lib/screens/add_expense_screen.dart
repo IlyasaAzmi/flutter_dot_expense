@@ -273,7 +273,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                                           "Data pengeluaranmu berhasil ditambahkan"),
                                       actions: <Widget>[
                                         FlatButton(
-                                          child: Text('Close me!'),
+                                          child: Text('Ok'),
                                           onPressed: () {
                                             Navigator.of(context).pop();
                                             Navigator.of(context).pop();
